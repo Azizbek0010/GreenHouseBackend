@@ -3,7 +3,7 @@ const Atxod = require('../models/Atxod')
 exports.create = async (req, res, next) => {
   try {
     const { flowerType, razmer, qty, sabab, qiymat } = req.body
-    const photo = req.file ? `/uploads/atxod/${req.file.filename}` : null
+    const photo = req.file ? req.file.path : null
 
     if (!photo) return res.status(400).json({ message: 'Rasm majburiy' })
 

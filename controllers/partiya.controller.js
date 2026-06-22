@@ -19,7 +19,7 @@ function validateFlowers(flowers) {
 
 exports.create = async (req, res, next) => {
   try {
-    const sentPhoto = req.file ? `/uploads/partiya/${req.file.filename}` : null
+    const sentPhoto = req.file ? req.file.path : null
     if (!sentPhoto) return res.status(400).json({ message: 'Rasm majburiy' })
 
     // multipart orqali flowers JSON-string sifatida keladi
@@ -72,7 +72,7 @@ exports.create = async (req, res, next) => {
 exports.receive = async (req, res, next) => {
   try {
     const { id } = req.params
-    const photo = req.file ? `/uploads/partiya/${req.file.filename}` : null
+    const photo = req.file ? req.file.path : null
 
     if (!photo) return res.status(400).json({ message: 'Rasm majburiy' })
 
