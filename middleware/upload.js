@@ -11,9 +11,9 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary,
   params: (req) => ({
-    folder:    `greenhouse/${req.uploadFolder || 'misc'}`,
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+    folder:        `greenhouse/${req.uploadFolder || 'misc'}`,
+    resource_type: 'image',
+    transformation: [{ quality: 'auto:good', width: 1200, crop: 'limit' }],
   }),
 })
 
