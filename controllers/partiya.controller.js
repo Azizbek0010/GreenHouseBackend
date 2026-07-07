@@ -124,10 +124,11 @@ exports.receive = async (req, res, next) => {
 
 exports.getAll = async (req, res, next) => {
   try {
+    const VALID_STATUS = ['yolda', 'qabul_qilindi', 'farq_bor']
     const filter = {}
     if (req.user.role === 'teplitsa') filter.teplitsa = req.user.id
     if (req.user.role === 'kassa')    filter.kassa = req.user.id
-    if (req.query.status)             filter.status = req.query.status
+    if (req.query.status && VALID_STATUS.includes(req.query.status)) filter.status = req.query.status
 
     const partiyalar = await Partiya.find(filter)
       .populate('teplitsa', 'name')
@@ -180,6 +181,24 @@ exports.getOne = async (req, res, next) => {
       if (safe.status === 'farq_bor') safe.status = 'qabul_qilindi'
       return res.json(safe)
     }
+
+    res.json(partiya)
+  } catch (err) {
+    next(err)
+  }
+}
+
+exports.confirmFarq = async (req, res, next) => {
+  try {
+    const partiya = await Partiya.findById(req.params.id)
+    if (!partiya) return res.status(404).json({ message: 'Topilmadi' })
+    if (partiya.status !== 'farq_bor') return res.status(400).json({ message: 'Partiya farq_bor holatida emas' })
+
+    partiya.status = 'qabul_qilindi'
+    await partiya.save()
+
+    const io = req.app.get('io')
+    io.to('admin').emit('partiya_yangilandi', { batchId: partiya.batchId, status: 'qabul_qilindi' })
 
     res.json(partiya)
   } catch (err) {

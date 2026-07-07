@@ -56,6 +56,16 @@ exports.getAll = async (req, res, next) => {
   }
 }
 
+exports.getOne = async (req, res, next) => {
+  try {
+    const sotuv = await Sotuv.findById(req.params.id).populate('kassa', 'name')
+    if (!sotuv) return res.status(404).json({ message: 'Topilmadi' })
+    res.json(sotuv)
+  } catch (err) {
+    next(err)
+  }
+}
+
 exports.getStats = async (req, res, next) => {
   try {
     const stats = await Sotuv.aggregate([

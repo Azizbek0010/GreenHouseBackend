@@ -9,5 +9,6 @@ const setFolder = (folder) => (req, res, next) => { req.uploadFolder = folder; n
 router.post('/',     auth, role('kassa'), setFolder('sotuv'), upload.single('photo'), ctrl.create)
 router.get('/',      auth,                ctrl.getAll)
 router.get('/stats', auth, role('admin'), ctrl.getStats)
+router.get('/:id',   auth,                ctrl.getOne)
 
 module.exports = router
