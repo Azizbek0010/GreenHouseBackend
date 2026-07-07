@@ -25,13 +25,26 @@ const qarzRoutes    = require('./routes/qarz.routes')
 const atxodRoutes   = require('./routes/atxod.routes')
 const statsRoutes   = require('./routes/stats.routes')
 
+const DEFAULT_ORIGINS = ['http://localhost:3000', 'http://localhost:8081', 'exp://localhost:8081']
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',')
-  : ['http://localhost:3000', 'http://localhost:8081', 'exp://localhost:8081']
+  ? [...DEFAULT_ORIGINS, ...process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim()).filter(Boolean)]
+  : DEFAULT_ORIGINS
+
+// CORS: ro'yxatdagi domenlar + har qanday *.vercel.app (prod + preview deploylar).
+// origin bo'lmasa (mobil app, curl, server-to-server) — ruxsat.
+function corsOrigin(origin, cb) {
+  if (!origin) return cb(null, true)
+  try {
+    const host = new URL(origin).hostname
+    if (ALLOWED_ORIGINS.includes(origin) || host === 'vercel.app' || host.endsWith('.vercel.app'))
+      return cb(null, true)
+  } catch { /* noto'g'ri origin */ }
+  cb(new Error('CORS: ruxsat etilmagan origin'))
+}
 
 const app    = express()
 const server = http.createServer(app)
-const io     = new Server(server, { cors: { origin: ALLOWED_ORIGINS } })
+const io     = new Server(server, { cors: { origin: corsOrigin } })
 
 // Socket.io — JWT orqali autentifikatsiya
 io.use((socket, next) => {
@@ -49,7 +62,7 @@ io.use((socket, next) => {
 app.set('io', io)
 
 app.use(helmet())
-app.use(cors({ origin: ALLOWED_ORIGINS }))
+app.use(cors({ origin: corsOrigin }))
 app.use(express.json({ limit: '1mb' }))
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
