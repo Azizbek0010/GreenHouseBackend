@@ -2,11 +2,20 @@ const Sotuv = require('../models/Sotuv')
 
 exports.create = async (req, res, next) => {
   try {
-    const { flowerType, razmer, qty, holat, pricePerUnit } = req.body
+    const { flowerType, razmer, qty, holat, pricePerUnit, discountPrice } = req.body
 
     const qtyN = Number(qty), priceN = Number(pricePerUnit), razmerN = Number(razmer)
     if (!flowerType || !Number.isInteger(qtyN) || qtyN <= 0 || !Number.isFinite(priceN) || priceN <= 0 || !Number.isFinite(razmerN) || razmerN <= 0)
       return res.status(400).json({ message: 'Gul turi, razmer, soni va narx to\'g\'ri kiritilishi shart' })
+
+    let discountN = null
+    if (discountPrice != null && discountPrice !== '') {
+      discountN = Number(discountPrice)
+      if (!Number.isFinite(discountN) || discountN <= 0)
+        return res.status(400).json({ message: "Chegirma narxi to'g'ri kiritilishi shart" })
+      if (discountN > priceN * qtyN)
+        return res.status(400).json({ message: "Chegirma narxi asl narxdan yuqori bo'lishi mumkin emas" })
+    }
 
     const sotuv = await Sotuv.create({
       kassa: req.user.id,
@@ -15,6 +24,7 @@ exports.create = async (req, res, next) => {
       qty: qtyN,
       holat,
       pricePerUnit: priceN,
+      discountPrice: discountN,
     })
 
     const io = req.app.get('io')

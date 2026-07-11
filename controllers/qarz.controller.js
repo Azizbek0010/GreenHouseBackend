@@ -12,9 +12,20 @@ function parseFlowers(arr) {
     if (!type || !Number.isFinite(razmer) || razmer <= 0 ||
         !Number.isInteger(qty) || qty <= 0 ||
         !Number.isFinite(price) || price <= 0) return null
-    flowers.push({ type, razmer, qty, pricePerUnit: price })
+
+    let discountPrice = null
+    if (f.discountPrice != null && f.discountPrice !== '') {
+      discountPrice = Number(f.discountPrice)
+      if (!Number.isFinite(discountPrice) || discountPrice <= 0 || discountPrice > price * qty) return null
+    }
+
+    flowers.push({ type, razmer, qty, pricePerUnit: price, discountPrice })
   }
   return flowers
+}
+
+function flowerTotal(f) {
+  return f.discountPrice != null ? f.discountPrice : f.pricePerUnit * f.qty
 }
 
 // POST /api/qarz — kassa qarzga sotadi
@@ -29,7 +40,7 @@ exports.create = async (req, res, next) => {
     if (!name)  return res.status(400).json({ message: 'Sotib oluvchi ismi shart' })
     if (!phone) return res.status(400).json({ message: 'Telefon raqami shart' })
 
-    const totalPrice = flowers.reduce((s, f) => s + f.pricePerUnit * f.qty, 0)
+    const totalPrice = flowers.reduce((s, f) => s + flowerTotal(f), 0)
 
     const qarz = await Qarz.create({
       kassa: req.user.id,

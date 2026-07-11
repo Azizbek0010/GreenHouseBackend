@@ -6,6 +6,7 @@ const flowerSchema = new mongoose.Schema({
   razmer:       { type: Number, required: true },
   qty:          { type: Number, required: true },
   pricePerUnit: { type: Number, required: true },
+  discountPrice: { type: Number, default: null },   // chegirma bilan yakuniy narx (ixtiyoriy)
 }, { _id: false })
 
 // Qarzni bo'lib-bo'lib to'lash tarixi (variant A: har bir to'lov o'sha kuni daromadga tushadi)
