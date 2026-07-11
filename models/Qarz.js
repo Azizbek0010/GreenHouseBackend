@@ -17,11 +17,9 @@ const paymentSchema = new mongoose.Schema({
 const qarzSchema = new mongoose.Schema({
   kassa:       { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   flowers:     { type: [flowerSchema], validate: v => Array.isArray(v) && v.length > 0 },
-  flowerPhoto: { type: String, required: true },   // gul rasmi (majburiy)
   buyer: {
     name:  { type: String, required: true },       // sotib oluvchi ismi
     phone: { type: String, required: true },       // telefon raqami
-    photo: { type: String, required: true },       // sotib oluvchi rasmi (majburiy)
   },
   totalPrice:  { type: Number, required: true },    // umumiy qarz summasi
   paidAmount:  { type: Number, default: 0 },        // shu paytgacha to'langan

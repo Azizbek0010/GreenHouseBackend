@@ -8,7 +8,6 @@ const sotuvSchema = new mongoose.Schema({
   holat:       { type: String, enum: ['yaxshi', 'nuqsonli'], default: 'yaxshi' },
   pricePerUnit:{ type: Number, required: true },
   totalPrice:  { type: Number },
-  photo:       { type: String, default: null },
 }, { timestamps: true })
 
 sotuvSchema.pre('save', function () {

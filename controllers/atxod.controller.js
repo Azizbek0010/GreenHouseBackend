@@ -3,9 +3,6 @@ const Atxod = require('../models/Atxod')
 exports.create = async (req, res, next) => {
   try {
     const { flowerType, razmer, qty, sabab, qiymat } = req.body
-    const photo = req.file ? req.file.path : null
-
-    if (!photo) return res.status(400).json({ message: 'Rasm majburiy' })
 
     const qtyN = Number(qty), razmerN = Number(razmer), qiymatN = Number(qiymat)
     if (!flowerType || !Number.isInteger(qtyN) || qtyN <= 0 || !Number.isFinite(razmerN) || razmerN <= 0)
@@ -20,7 +17,6 @@ exports.create = async (req, res, next) => {
       qty: qtyN,
       sabab,
       qiymat: qiymatN,
-      photo,
     })
 
     const io = req.app.get('io')

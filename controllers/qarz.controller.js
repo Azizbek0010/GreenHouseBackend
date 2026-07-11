@@ -1,9 +1,6 @@
 const Qarz = require('../models/Qarz')
 
-// FormData ichida flowers JSON string bo'lib keladi
-function parseFlowers(raw) {
-  let arr
-  try { arr = typeof raw === 'string' ? JSON.parse(raw) : raw } catch { return null }
+function parseFlowers(arr) {
   if (!Array.isArray(arr) || arr.length === 0) return null
 
   const flowers = []
@@ -20,7 +17,7 @@ function parseFlowers(raw) {
   return flowers
 }
 
-// POST /api/qarz — kassa qarzga sotadi (2 rasm: flowerPhoto + buyerPhoto)
+// POST /api/qarz — kassa qarzga sotadi
 exports.create = async (req, res, next) => {
   try {
     const flowers = parseFlowers(req.body.flowers)
@@ -32,18 +29,12 @@ exports.create = async (req, res, next) => {
     if (!name)  return res.status(400).json({ message: 'Sotib oluvchi ismi shart' })
     if (!phone) return res.status(400).json({ message: 'Telefon raqami shart' })
 
-    const flowerPhoto = req.files?.flowerPhoto?.[0]?.path || null
-    const buyerPhoto  = req.files?.buyerPhoto?.[0]?.path  || null
-    if (!flowerPhoto) return res.status(400).json({ message: 'Gul rasmi shart' })
-    if (!buyerPhoto)  return res.status(400).json({ message: 'Sotib oluvchi rasmi shart' })
-
     const totalPrice = flowers.reduce((s, f) => s + f.pricePerUnit * f.qty, 0)
 
     const qarz = await Qarz.create({
       kassa: req.user.id,
       flowers,
-      flowerPhoto,
-      buyer: { name, phone, photo: buyerPhoto },
+      buyer: { name, phone },
       totalPrice,
     })
 
